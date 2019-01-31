@@ -21,7 +21,7 @@ struct mosi {                           // sending frame
     uint8_t address;                    // slave address
     uint8_t command;                    // command
     uint8_t block_size;                 // data length
-    uint8_t block [MAX_BLOCK_SIZE];     // contrains the data
+    uint8_t *block;                     // contrains the data
     uint8_t checksum;                   // checksum
 };
 
@@ -31,7 +31,7 @@ struct miso {                           // receiving frame
     uint8_t command;                    // command
     uint8_t state;                      // state
     uint8_t block_size;                 // data length
-    uint8_t block [MAX_BLOCK_SIZE];     // contrains the data
+    uint8_t *block;                     // contrains the data
     uint8_t checksum;                   // checksum
 };
 
