@@ -4,7 +4,7 @@
 //
 //  Created by Benjamin Rannow on 31.01.19.
 //  Copyright © 2019 Benjamin Rannow. All rights reserved.
-// https://www.sensirion.com/fileadmin/user_upload/customers/sensirion/Dokumente/0_Datasheets/Particulate_Matter/Sensirion_PM_Sensors_SPS30_Datasheet.pdf
+//
 
 #ifndef sps30_h
 #define sps30_h
