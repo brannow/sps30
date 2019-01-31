@@ -1,5 +1,5 @@
 #!/bin/bash
 rm -rf bin
 mkdir bin
-#gcc -pthread $(find ./sps30 -name "*.c") -o sps30Bin -v
-gcc $(find ./sps30 -name "*.c") -o bin/sps30
+#gcc -pthread $(find ./src -name "*.c") -o sps30Bin -v
+gcc $(find ./src -name "*.c") -o bin/sps30
