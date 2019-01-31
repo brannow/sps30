@@ -13,27 +13,26 @@
 #include <stdbool.h>
 
 #define MAX_BLOCK_SIZE 256
-// [0x7E] [0x00] [0x00] [0x02] [0x01 0x03] [0xF9] [0x7E]
+
+#define START_STOP_BYTE_FLAG 0x7E
+
+// [0x7E] | [0x00] [0x00] [0x02] [0x01 0x03] [0xF9] | [0x7E]
 struct mosi {                           // sending frame
-    uint8_t start;                      // start 0x7E
     uint8_t address;                    // slave address
     uint8_t command;                    // command
     uint8_t block_size;                 // data length
     uint8_t block [MAX_BLOCK_SIZE];     // contrains the data
     uint8_t checksum;                   // checksum
-    uint8_t stop;                      // stop 0x7E
 };
 
-// [0x7E] [0x00] [0x00] [0x00] [0x00] [] [0xFF] [0x7E]
+// [0x7E] | [0x00] [0x00] [0x00] [0x00] [] [0xFF] | [0x7E]
 struct miso {                           // receiving frame
-    uint8_t start;                      // start 0x7E
     uint8_t address;                    // slave address
     uint8_t command;                    // command
     uint8_t state;                      // state
     uint8_t block_size;                 // data length
     uint8_t block [MAX_BLOCK_SIZE];     // contrains the data
     uint8_t checksum;                   // checksum
-    uint8_t stop;                      // stop 0x7E
 };
 
 #define STATE_OK                    0x0  // OK
