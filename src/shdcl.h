@@ -35,13 +35,15 @@ struct miso {                           // receiving frame
     uint8_t checksum;                   // checksum
 };
 
-#define STATE_OK                    0x0  // OK
-#define STATE_INVALID_BLOCK_SITE    0x1  // invalid block size
-#define STATE_INVALID_COMMAND       0x2  // unknown command
-#define STATE_ACCESS_DENIED         0x3  // no access rights for command
-#define STATE_INVALID_PARAMETER     0x4  // invalid command parameter or out of range
-#define STATE_INTERNAL_ERROR        0x28 // internal function argument invalid or out of range
-#define STATE_RUNTIME_ERROR         0x43 // command currently not allowed
+enum shdlc_state {
+    STATE_OK =                  0x0,  // OK
+    STATE_INVALID_BLOCK_SITE =  0x1,  // invalid block size
+    STATE_INVALID_COMMAND =     0x2,  // unknown command
+    STATE_ACCESS_DENIED =       0x3,  // no access rights for command
+    STATE_INVALID_PARAMETER =   0x4,  // invalid command parameter or out of range
+    STATE_INTERNAL_ERROR =      0x28, // internal function argument invalid or out of range
+    STATE_RUNTIME_ERROR =       0x43  // command currently not allowed
+};
 
 /**
  * calculate the mosi checksum
