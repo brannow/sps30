@@ -19,7 +19,7 @@ struct sensorData {                 // mg = microgramm!
     float mass_particlemc_025pm;    // pm2.5    mg/m3
     float mass_particlemc_040pm;    // pm4      mg/m3
     float mass_particlemc_100pm;    // pm10     mg/m3
-    float count_particle_005pm;     // pm0.5    #/m3
+    float count_particle_005pm;     // pm0.5    #/cm3
     float count_particle_010pm;     // pm1      #/cm3
     float count_particle_025pm;     // pm2.5    #/cm3
     float count_particle_040pm;     // pm4      #/cm3
