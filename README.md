@@ -26,7 +26,7 @@ double check the cmdline.txt and config.txt
 in /boot/```config.txt```
 
 check if enable_uart=1 exists. 
-Plus this line at the end ```dtoverlay=pi3-disable-bt``` 
+Plus add this line at the end of config.txt ```dtoverlay=pi3-disable-bt``` 
 ```
 enable_uart=1
 dtoverlay=pi3-disable-bt
@@ -40,8 +40,8 @@ no other "console" stuff should be there (exception: console=tty1)
 
 ## disable BT hciuart
 check status with ```sudo systemctl status hciuart```
-if the service not found or "active: (dead)" this is fine.<br/>
-if it's active 
+if the service is not found or "active: (dead)", this is fine.<br/>
+if it's active, stop and remove the service. 
 ```
 sudo systemctl stop hciuart
 sudo systemctl disable hciuart
