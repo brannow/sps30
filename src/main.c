@@ -7,9 +7,18 @@
 //
 
 #include <stdio.h>
+#include <unistd.h>
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
+#include "sps30.h"
+
+int main(int argc, const char * argv[])
+{
+    sps30_init();
+    
+    char sen[SPS_MAX_SERIAL_LEN];
+    sps30_getSerialNumber(sen);
+    
+    printf("%s", sen);
+    
     return 0;
 }

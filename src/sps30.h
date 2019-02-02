@@ -14,6 +14,8 @@
 
 #pragma mark - Const
 
+#define SPS_MAX_SERIAL_LEN 32
+
 struct sensorData {                 // mg = microgramm!
     float mass_particlemc_010pm;    // pm1      mg/m3
     float mass_particlemc_025pm;    // pm2.5    mg/m3
@@ -33,7 +35,7 @@ struct sensorData {                 // mg = microgramm!
  * check if sensor functional
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_init(void);
+int8_t sps30_init(void);
 
 /**
  * reset sensor
@@ -48,7 +50,7 @@ int16_t sps30_reset(void);
  *
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_getSerialNumber(char *serialNumber);
+int8_t sps30_getSerialNumber(char *serialNumber);
 
 /**
  * start messurement
