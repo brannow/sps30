@@ -1,74 +1,74 @@
 # sps30
-Control program for the senirion sps30 particle matter sensor (UART interface)
+Control program for the senirion sps30 particle matter sensor (I²C interface)
 
 ## Hardware/OS
 * Raspberry Pi (Zero/w)
 * Sensirion SPS30
 * Raspbian Stretch Lite (version: Nov 2018)
 
-## Pi Serial 
-in terms to activate UART over GPIO pin (8 and 10) we need to disable every service that blocks us.
+## Pi - I²C (Inter-Integrated Circuit / i2c) 
+activate i2c with the raspi-config
 ```
 sudo raspi-config
 ```
 enter rapsi config menu navigate to 5. Interfacing Options
 ![raspi-config1](https://raw.githubusercontent.com/brannow/sps30/master/docs/raspi-config_level1.png)
 
-go to P6 Serial and disable the login shell but leave the hardware running
+go to P5 I2C and enable it
 
-![raspi-config2](https://raw.githubusercontent.com/brannow/sps30/master/docs/raspi-config_level2.png)
+![raspi-config2](https://raw.githubusercontent.com/brannow/sps30/master/docs/i2c_enable.png)
 
-at the end the result screen should something like this 
-![raspi-config_success](https://raw.githubusercontent.com/brannow/sps30/master/docs/raspi-config_disable_serial_success.png)
+double check the config.txt 
 
-double check the cmdline.txt and config.txt 
-
-in /boot/```config.txt```
-
-check if enable_uart=1 exists. 
-Plus add this line at the end of config.txt ```dtoverlay=pi3-disable-bt``` 
+in ```/boot/config.txt```
+ 
+Add the correct clock rate for 200kHz. <br /> (NOTE: rPI clock speed is CPU bound and very inaccurate so i set it to 230000)
 ```
-enable_uart=1
-dtoverlay=pi3-disable-bt
-```
-in /boot/```cmdline.txt```
-
-```
-dwc_otg.lpm_enable=0 console=tty1 root=PARTUUID=d8d0a62d-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
-```
-no other "console" stuff should be there (exception: console=tty1)
-
-## disable BT hciuart
-check status with ```sudo systemctl status hciuart```
-if the service is not found or "active: (dead)", this is fine.<br/>
-if it's active, stop and remove the service. 
-```
-sudo systemctl stop hciuart
-sudo systemctl disable hciuart
+dtparam=i2c_arm=on
+dtparam=i2c_arm_baudrate=230000
 ```
 
-## UART first test
+## GPIO Pins
 
-### hardware
-
-Wire GPIO pin 8 and 10 together:<br/>
 ![gpio](https://raw.githubusercontent.com/brannow/sps30/master/docs/gpio.png)
 
-### software
-use screen or minicom (i'll prefer screen)
-install over apt: ```sudo apt install screen```
+NOTE: power of the PI befor wiring up.<br />
+NOTE: i2c is not suitable for long wirings keep the wires as short as possible (not longer than 10cm / 4inches)
 
-minicom: 
-```
-minicom -D /dev/serial0
-```
+## Test
 
-screen: 
-```
-screen /dev/serial0 115200
+install i2c-tools via apt:
+``` 
+sudo apt update
+sudo apt install i2c-tools
 ```
 
-if you can type and see what you type the connection is Fine!<br/>
-if you see nothing something is wrong! maybe try serial port /dev/serial1 instead.<br/>
-*Remember to terminale the screen / minicon session otherwise UART is blocked*
+after that, check if the sensor is reachable:
+```
+i2cdetect -y 1
+```
+the output should look like this: 
+``` 
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:          -- -- -- -- -- -- -- -- -- -- -- -- -- 
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+60: -- -- -- -- -- -- -- -- -- 69 -- -- -- -- -- -- 
+70: -- -- -- -- -- -- -- --  
+```
 
+0x69 is the i2c address from the sps30 - sensor
+
+## Compile 
+execute the build script 
+```
+./build
+```
+
+## Execute
+The final binary is ```./bin/sps30```
+
+[TODO: add more here]
