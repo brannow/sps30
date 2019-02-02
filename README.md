@@ -32,7 +32,7 @@ dtparam=i2c_arm_baudrate=230000
 
 ![gpio_i2c](https://raw.githubusercontent.com/brannow/sps30/master/docs/gpio_i2c.png)
 
-NOTE: power of the PI befor wiring up.<br />
+NOTE: powering off the PI before connect the cables to the GPIO.<br />
 NOTE: i2c is not suitable for long wirings keep the wires as short as possible (not longer than 10cm / 4inches)
 
 ## Test
