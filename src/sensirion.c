@@ -3,7 +3,7 @@
 //  sps30
 //
 //  Created by Benjamin Rannow on 02.02.19.
-//  Copyright © 2019 Fuyukai Rannow. All rights reserved.
+//  Copyright © 2019 Benjamin Rannow. All rights reserved.
 //
 
 #include <stdint.h>
