@@ -15,7 +15,7 @@ int main(int argc, const char * argv[])
 {
     sps30_init();
     
-    char sen[SPS_MAX_SERIAL_LEN];
+    char sen[SPS_MAX_ASCII_LEN];
     sps30_getSerialNumber(sen);
     
     printf("%s", sen);

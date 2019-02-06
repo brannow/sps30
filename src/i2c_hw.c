@@ -23,6 +23,13 @@
 static int i2c_handle = 0;
 static uint8_t i2c_address = 0;
 
+/**
+ * open the i2c bus
+ *
+ * path: system /dev/XXXXX address
+ *
+ * Return: 0 if success | -1 if failed
+ */
 int8_t i2c_init(const char *path)
 {
     i2c_handle = open(path, O_RDWR);
@@ -33,6 +40,13 @@ int8_t i2c_init(const char *path)
     return 0;
 }
 
+/**
+ * set the i2c slave address
+ *
+ * address: i2c slave address | i2cdetect -y 1
+ *
+ * Return: 0 if success | -1 if failed
+ */
 int8_t i2c_set_address(uint8_t address)
 {
     if (i2c_address != address) {
@@ -47,8 +61,17 @@ int8_t i2c_set_address(uint8_t address)
     return 0;
 }
 
+/**
+ * Read on i2c bus
+ *
+ * data: byte buffer
+ * count: byte buffer size
+ *
+ * Return: 0 if success | -1 if failed
+ */
 int8_t i2c_read(uint8_t* data, uint16_t count)
 {
+    // read returned the readed byte size
     if (read(i2c_handle, data, count) != count) {
         return I2C_READ_FAILED;
     }
@@ -56,6 +79,14 @@ int8_t i2c_read(uint8_t* data, uint16_t count)
     return I2C_READWRITE_SUCCESS;
 }
 
+/**
+ * Write on i2c bus
+ *
+ * data: byte buffer
+ * count: byte buffer size
+ *
+ * Return: 0 if success | -1 if failed
+ */
 int8_t i2c_write(const uint8_t* data, uint16_t count)
 {    
     if (write(i2c_handle, data, count) != count) {

@@ -14,13 +14,13 @@
 
 #pragma mark - Const
 
-#define SPS_MAX_SERIAL_LEN 32
+#define SPS_MAX_ASCII_LEN 32
 
 struct sensorData {                 // mg = microgramm!
-    float mass_particlemc_010pm;    // pm1      mg/m3
-    float mass_particlemc_025pm;    // pm2.5    mg/m3
-    float mass_particlemc_040pm;    // pm4      mg/m3
-    float mass_particlemc_100pm;    // pm10     mg/m3
+    float mass_particlemc_010pm;    // pm1      μg/m3
+    float mass_particlemc_025pm;    // pm2.5    μg/m3
+    float mass_particlemc_040pm;    // pm4      μg/m3
+    float mass_particlemc_100pm;    // pm10     μg/m3
     float count_particle_005pm;     // pm0.5    #/cm3
     float count_particle_010pm;     // pm1      #/cm3
     float count_particle_025pm;     // pm2.5    #/cm3
@@ -46,36 +46,36 @@ int16_t sps30_reset(void);
 /**
  * read sensor serial number
  *
- * serialNumber: serial is 0x0 terminated
+ * serialNumber: string is 0x0 terminated
  *
  * Return: 0 if success or negative sensor error code
  */
 int8_t sps30_getSerialNumber(char *serialNumber);
 
 /**
+ * read sensor Article number
+ *
+ * articalNumber: string is 0x0 terminated
+ *
+ * Return: 0 if success or negative sensor error code
+ */
+int8_t sps30_getProductNumber(char *productNumber);
+
+/**
  * start messurement
  *
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_start(void);
+int8_t sps30_start(void);
 
 /**
  * stop messurement
  *
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_stop(void);
+int8_t sps30_stop(void);
 
 #pragma mark - Messurement
-
-/**
- * get the newest sensor data
- *
- * data: struct sensorData // see: sps30.h
- *
- * Return: 0 if success or negative sensor error code
- */
-int16_t sps30_getSensorData(struct sensorData *data);
 
 /**
  * if new (since last pull) data available
@@ -84,7 +84,16 @@ int16_t sps30_getSensorData(struct sensorData *data);
  *
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_isNewDataAvailable(bool *check);
+int8_t sps30_isNewDataAvailable(bool *check);
+
+/**
+ * get the newest sensor data
+ *
+ * data: struct sensorData // see: sps30.h
+ *
+ * Return: 0 if success or negative sensor error code
+ */
+int8_t sps30_getSensorData(struct sensorData *data);
 
 #pragma mark - Dust Cleaning
 
@@ -100,7 +109,7 @@ int16_t sps30_isNewDataAvailable(bool *check);
  *
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_getFanAutoCleanInterval(uint32_t *seconds);
+int8_t sps30_getFanAutoCleanInterval(uint32_t *seconds);
 
 /**
  * set the auto cleaning interval,
@@ -114,6 +123,6 @@ int16_t sps30_getFanAutoCleanInterval(uint32_t *seconds);
  *
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_setFanAutoCleanInterval(uint32_t seconds);
+int8_t sps30_setFanAutoCleanInterval(uint32_t seconds);
 
 #endif /* sps30_h */

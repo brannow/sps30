@@ -2,9 +2,38 @@
 //  sensirion.c
 //  sps30
 //
-//  Created by Benjamin Rannow on 02.02.19.
-//  Copyright © 2019 Benjamin Rannow. All rights reserved.
+//  Created/Modified by Benjamin Rannow on 02.02.19.
 //
+/*
+ * Copyright (c) 2018, Sensirion AG
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * * Neither the name of Sensirion AG nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #include <stdint.h>
 #include <unistd.h>
@@ -67,7 +96,7 @@ uint16_t sensirion_fill_cmd_send_buf(uint8_t *buf, uint16_t cmd, const uint16_t 
     return idx;
 }
 
-int16_t sensirion_read_bytes(uint8_t *data, uint16_t num_words)
+int8_t sensirion_read_bytes(uint8_t *data, uint16_t num_words)
 {
     int16_t ret;
     uint16_t i, j;
@@ -93,7 +122,7 @@ int16_t sensirion_read_bytes(uint8_t *data, uint16_t num_words)
     return STATUS_OK;
 }
 
-int16_t sensirion_read_words(uint16_t *data_words, uint16_t num_words)
+int8_t sensirion_read_words(uint16_t *data_words, uint16_t num_words)
 {
     int16_t ret;
     uint8_t i;
@@ -108,7 +137,7 @@ int16_t sensirion_read_words(uint16_t *data_words, uint16_t num_words)
     return STATUS_OK;
 }
 
-int16_t sensirion_write_cmd(uint16_t command)
+int8_t sensirion_write_cmd(uint16_t command)
 {
     uint8_t buf[SENSIRION_COMMAND_SIZE];
     
@@ -116,7 +145,7 @@ int16_t sensirion_write_cmd(uint16_t command)
     return i2c_write(buf, SENSIRION_COMMAND_SIZE);
 }
 
-int16_t sensirion_write_cmd_with_args(uint16_t command, const uint16_t *data_words, uint16_t num_words)
+int8_t sensirion_write_cmd_with_args(uint16_t command, const uint16_t *data_words, uint16_t num_words)
 {
     uint8_t buf[SENSIRION_MAX_BUFFER_WORDS];
     uint16_t buf_size;
@@ -125,7 +154,7 @@ int16_t sensirion_write_cmd_with_args(uint16_t command, const uint16_t *data_wor
     return i2c_write(buf, buf_size);
 }
 
-int16_t sensirion_read_delayed_cmd(uint16_t cmd, uint32_t delay_us, uint16_t *data_words, uint16_t num_words)
+int8_t sensirion_read_delayed_cmd(uint16_t cmd, uint32_t delay_us, uint16_t *data_words, uint16_t num_words)
 {
     int16_t ret;
     uint8_t buf[SENSIRION_COMMAND_SIZE];
@@ -141,7 +170,7 @@ int16_t sensirion_read_delayed_cmd(uint16_t cmd, uint32_t delay_us, uint16_t *da
     return sensirion_read_words(data_words, num_words);
 }
 
-int16_t sensirion_read_cmd(uint16_t cmd, uint16_t *data_words, uint16_t num_words)
+int8_t sensirion_read_cmd(uint16_t cmd, uint16_t *data_words, uint16_t num_words)
 {
     return sensirion_read_delayed_cmd(cmd, 0, data_words, num_words);
 }
