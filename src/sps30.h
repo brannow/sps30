@@ -98,6 +98,16 @@ int8_t sps30_getSensorData(struct sensorData *data);
 #pragma mark - Dust Cleaning
 
 /**
+ * Start fan Cleaning manually
+ * NOTE: CAN ONLY RUNNED AFTER MESUREMENT IS STARTED
+ *
+ * Reset Fan Cleaning Internal Interval to 0
+ *
+ * Return 0 if success or negative sensor error code
+ */
+int8_t sps30_startFanCleaning();
+
+/**
  * get the auto cleaning interval,
  * auto-cleaning starts fan at full speed for 10 seconds
  * default: 604800 seconds (1 week)
