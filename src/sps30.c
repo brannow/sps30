@@ -107,9 +107,7 @@ int8_t sps30_start()
     // argument expected to be 3 byte long (0x03 0x00 CRC)
     // 0x03 0x00 (crc is added in sensirion module)
     const uint16_t arg = (0x03 << 8) | 0x00;
-    return sensirion_i2c_write_cmd_with_args(SPS_CMD_START_MEASUREMENT,
-                                             &arg,
-                                             SENSIRION_NUM_WORDS(arg));
+    return sensirion_write_cmd_with_args(SPS_CMD_START_MEASUREMENT, &arg, SENSIRION_NUM_WORDS(arg));
 }
 
 /**
@@ -127,7 +125,7 @@ int8_t sps30_stop()
  * Return: 0 if success or negative sensor error code
  */
 int8_t sps30_reset() {
-    return sensirion_i2c_write_cmd(SPS_CMD_RESET);
+    return sensirion_write_cmd(SPS_CMD_RESET);
 }
 
 #pragma mark - Messurement
@@ -168,7 +166,7 @@ int8_t sps30_getSensorData(struct sensorData *data)
  */
 int8_t sps30_startFanCleaning()
 {
-    return sensirion_i2c_write_cmd(SPS_CMD_FAN_CLEAN);
+    return sensirion_write_cmd(SPS_CMD_FAN_CLEAN);
 }
 
 /**

@@ -41,7 +41,7 @@ int8_t sps30_init(void);
  * reset sensor
  * Return: 0 if success or negative sensor error code
  */
-int16_t sps30_reset(void);
+int8_t sps30_reset(void);
 
 /**
  * read sensor serial number
@@ -105,7 +105,7 @@ int8_t sps30_getSensorData(struct sensorData *data);
  *
  * Return 0 if success or negative sensor error code
  */
-int8_t sps30_startFanCleaning();
+int8_t sps30_startFanCleaning(void);
 
 /**
  * get the auto cleaning interval,
