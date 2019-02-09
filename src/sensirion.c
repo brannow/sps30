@@ -100,7 +100,8 @@ int8_t sensirion_read_bytes(uint8_t *data, uint16_t num_words)
 {
     int16_t ret;
     uint16_t i, j;
-    uint16_t size = num_words * (SENSIRION_WORD_SIZE + CRC8_LEN);
+    // + 8bit CRC
+    uint16_t size = num_words * (SENSIRION_WORD_SIZE + 1);
     uint16_t word_buf[SENSIRION_MAX_BUFFER_WORDS];
     uint8_t * const buf8 = (uint8_t *)word_buf;
     
@@ -108,8 +109,8 @@ int8_t sensirion_read_bytes(uint8_t *data, uint16_t num_words)
     if (ret != STATUS_OK)
         return ret;
     
-    /* check the CRC for each word */
-    for (i = 0, j = 0; i < size; i += SENSIRION_WORD_SIZE + CRC8_LEN) {
+    /* check the CRC for each word ( + CRC = 8bit) */
+    for (i = 0, j = 0; i < size; i += SENSIRION_WORD_SIZE + 1) {
         
         ret = sensirion_check_crc(&buf8[i], SENSIRION_WORD_SIZE, buf8[i + SENSIRION_WORD_SIZE]);
         if (ret != STATUS_OK)
