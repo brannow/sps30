@@ -13,7 +13,18 @@
 
 int main(int argc, const char * argv[])
 {
+    bool newData = false;
+    char serial[SPS_MAX_ASCII_LEN];
+    
     sps30_init();
+    sps30_reset();
+    
+    printf("starting sensor\n");
+    sps30_start();
+    printf("sensor started\n");
+    
+    
+    sps30_stop();
     
     return 0;
 }

@@ -6,6 +6,8 @@
 //  Copyright © 2019 Benjamin Rannow. All rights reserved.
 //
 
+#include <unistd.h>
+
 #include "sps30.h"
 #include "sensirion.h"
 
@@ -39,7 +41,7 @@ int8_t sps30_init()
         return sps30_getSerialNumber(serialNumber);
     }
     
-    return -1;
+    return STATUS_FAIL;
 }
 
 /**
@@ -87,14 +89,13 @@ int8_t sps30_getAsciiData(uint16_t cmd, char *data)
     if (ret != STATUS_OK)
         return ret;
     
-    SENSIRION_WORDS_TO_BYTES(buffer.data, SENSIRION_NUM_WORDS(buffer.data));
     for (i = 0; i < SPS_MAX_ASCII_LEN; ++i) {
         data[i] = buffer.data[i];
         if (data[i] == '\0')
-            return 0;
+            return STATUS_OK;
     }
     
-    return 0;
+    return STATUS_FAIL;
 }
 
 /**
@@ -104,10 +105,16 @@ int8_t sps30_getAsciiData(uint16_t cmd, char *data)
  */
 int8_t sps30_start()
 {
-    // argument expected to be 3 byte long (0x03 0x00 CRC)
+    // sensor expected to be 3 byte long (0x03 0x00 CRC) however
     // 0x03 0x00 (crc is added in sensirion module)
     const uint16_t arg = (0x03 << 8) | 0x00;
-    return sensirion_write_cmd_with_args(SPS_CMD_START_MEASUREMENT, &arg, SENSIRION_NUM_WORDS(arg));
+    int8_t ret = sensirion_write_cmd_with_args(SPS_CMD_START_MEASUREMENT, &arg, SENSIRION_NUM_WORDS(arg));
+    
+    if (ret != STATUS_OK)
+        return ret;
+    
+    sleep(2);
+    return ret;
 }
 
 /**
@@ -124,8 +131,19 @@ int8_t sps30_stop()
  * reset sensor
  * Return: 0 if success or negative sensor error code
  */
-int8_t sps30_reset() {
-    return sensirion_write_cmd(SPS_CMD_RESET);
+int8_t sps30_reset()
+{
+    int8_t ret = sensirion_write_cmd(SPS_CMD_RESET);
+    if (ret != STATUS_OK)
+        return ret;
+    
+    sleep(2);
+    return ret;
+}
+
+int8_t sps30_destroy()
+{
+    return sensirion_terminate();
 }
 
 #pragma mark - Messurement
@@ -139,7 +157,20 @@ int8_t sps30_reset() {
  */
 int8_t sps30_isNewDataAvailable(bool *check)
 {
+    *check = false;
+    uint16_t buffer;
+    int8_t ret = sensirion_read_cmd(SPS_CMD_GET_DATA_READY,
+                           &buffer, SENSIRION_NUM_WORDS(buffer));
     
+    if (ret != STATUS_OK)
+        return ret;
+    
+    uint8_t bitBuffer[2] = {buffer & 0xff, buffer >> 8};
+    if (bitBuffer[0] == 0x00 && bitBuffer[1] == 0x01) {
+        *check = true;
+    }
+    
+    return STATUS_OK;
 }
 
 /**
@@ -166,7 +197,12 @@ int8_t sps30_getSensorData(struct sensorData *data)
  */
 int8_t sps30_startFanCleaning()
 {
-    return sensirion_write_cmd(SPS_CMD_FAN_CLEAN);
+    int8_t ret = sensirion_write_cmd(SPS_CMD_FAN_CLEAN);
+    if (ret != STATUS_OK)
+        return ret;
+    // sleep for 20 seconds to secure the sensor
+    sleep(20);
+    return ret;
 }
 
 /**

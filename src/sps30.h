@@ -75,6 +75,15 @@ int8_t sps30_start(void);
  */
 int8_t sps30_stop(void);
 
+/**
+ * TODO: currently SEG_FAULT - DUNNO why -.-
+ * DO NOT USE THIS ATM!
+ *
+ * Close connection to sps30
+ * after reusing, a new init is reqired
+ */
+int8_t sps30_destroy(void);
+
 #pragma mark - Messurement
 
 /**

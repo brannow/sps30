@@ -88,10 +88,16 @@ int8_t i2c_read(uint8_t* data, uint16_t count)
  * Return: 0 if success | -1 if failed
  */
 int8_t i2c_write(const uint8_t* data, uint16_t count)
-{    
+{
     if (write(i2c_handle, data, count) != count) {
         return I2C_WRITE_FAILED;
     }
     
     return I2C_READWRITE_SUCCESS;
+}
+
+
+int8_t i2c_close()
+{
+   return close(i2c_handle);
 }

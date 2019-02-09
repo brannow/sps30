@@ -50,4 +50,10 @@ int8_t i2c_read(uint8_t* data, uint16_t count);
  */
 int8_t i2c_write(const uint8_t* data, uint16_t count);
 
+/**
+ * Close the i2c data handle
+ * after this a new init is required
+ */
+int8_t i2c_close(void);
+
 #endif /* i2c_hw_h */

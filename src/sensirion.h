@@ -92,4 +92,6 @@ int8_t sensirion_write_cmd(uint16_t command);
 
 int8_t sensirion_write_cmd_with_args(uint16_t command, const uint16_t *data_words, uint16_t num_words);
 
+int8_t sensirion_terminate(void);
+
 #endif /* sensirion_h */
