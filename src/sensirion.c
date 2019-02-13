@@ -135,7 +135,7 @@ int8_t sensirion_read_words(uint16_t *data_words, uint16_t num_words)
     for (i = 0; i < num_words; ++i)
         data_words[i] = be16_to_cpu(data_words[i]);
     
-    SENSIRION_WORDS_TO_BYTES(data_words, SENSIRION_NUM_WORDS(data_words));
+    //SENSIRION_WORDS_TO_BYTES(data_words, SENSIRION_NUM_WORDS(data_words));
     return STATUS_OK;
 }
 

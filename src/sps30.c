@@ -6,7 +6,8 @@
 //  Copyright © 2019 Benjamin Rannow. All rights reserved.
 //
 
-#include <unistd.h>
+#include <string.h> // memcpy
+#include <unistd.h> // usleep
 
 #include "sps30.h"
 #include "sensirion.h"
@@ -22,7 +23,8 @@
 #define SPS_CMD_GET_SERIAL              0xd033
 #define SPS_CMD_GET_PRODUCT             0xd025
 #define SPS_CMD_RESET                   0xd304
-#define SPS_WRITE_DELAY                  20000
+
+#define SPS_WRITE_DELAY                 200000
 
 static const uint8_t SPS30_I2C_ADDRESS = 0x69;
 
@@ -89,6 +91,7 @@ int8_t sps30_getAsciiData(uint16_t cmd, char *data)
     if (ret != STATUS_OK)
         return ret;
     
+    SENSIRION_WORDS_TO_BYTES(buffer.data, SENSIRION_NUM_WORDS(buffer.data));
     for (i = 0; i < SPS_MAX_ASCII_LEN; ++i) {
         data[i] = buffer.data[i];
         if (data[i] == '\0')
@@ -113,7 +116,7 @@ int8_t sps30_start()
     if (ret != STATUS_OK)
         return ret;
     
-    sleep(2);
+    usleep(SPS_WRITE_DELAY);
     return ret;
 }
 
@@ -124,7 +127,13 @@ int8_t sps30_start()
  */
 int8_t sps30_stop()
 {
-    return sensirion_write_cmd(SPS_CMD_STOP_MEASUREMENT);
+    int8_t ret = sensirion_write_cmd(SPS_CMD_START_MEASUREMENT);
+    
+    if (ret != STATUS_OK)
+        return ret;
+    
+    usleep(SPS_WRITE_DELAY);
+    return ret;
 }
 
 /**
@@ -137,10 +146,14 @@ int8_t sps30_reset()
     if (ret != STATUS_OK)
         return ret;
     
-    sleep(2);
+    usleep(SPS_WRITE_DELAY);
     return ret;
 }
 
+/**
+ * Experimental
+ * do not use
+ */
 int8_t sps30_destroy()
 {
     return sensirion_terminate();
@@ -165,6 +178,7 @@ int8_t sps30_isNewDataAvailable(bool *check)
     if (ret != STATUS_OK)
         return ret;
     
+    SENSIRION_WORDS_TO_BYTES(&buffer, SENSIRION_NUM_WORDS(buffer));
     uint8_t bitBuffer[2] = {buffer & 0xff, buffer >> 8};
     if (bitBuffer[0] == 0x00 && bitBuffer[1] == 0x01) {
         *check = true;
@@ -182,7 +196,24 @@ int8_t sps30_isNewDataAvailable(bool *check)
  */
 int8_t sps30_getSensorData(struct sensorData *data)
 {
+    int8_t ret;
+    union {
+        uint16_t u16[2];
+        uint32_t u32;
+    } buffer[10];
     
+    ret = sensirion_read_cmd(SPS_CMD_READ_MEASUREMENT,
+                                 buffer->u16, SENSIRION_NUM_WORDS(buffer));
+    if (ret != STATUS_OK)
+        return ret;
+    
+    SENSIRION_WORDS_TO_BYTES(buffer->u16, SENSIRION_NUM_WORDS(buffer));
+    for (int i = 0; i < 10; i++) {
+        buffer[i].u32 = be32_to_cpu(buffer[i].u32);
+    }
+    
+    memcpy(data, buffer, sizeof buffer);
+    return 0;
 }
 
 #pragma mark - Dust Cleaning
@@ -208,10 +239,13 @@ int8_t sps30_startFanCleaning()
 /**
  * get the auto cleaning interval,
  * auto-cleaning starts fan at full speed for 10 seconds
- * default: 604800 seconds (1 week)
+ * default: 345600 seconds (4 days)
  *
  * NOTE: if the sensor is off (power off) the internal clock is reseted to 0!
  * make sure that the sensor is cleaned at least once a week
+ *
+ * after setting a new interval this immediately active,
+ * getFanAutoCleanInterval will not return this value until the next start/restart of the sensor
  *
  * seconds: auto cleaning interval
  *
@@ -219,16 +253,31 @@ int8_t sps30_startFanCleaning()
  */
 int8_t sps30_getFanAutoCleanInterval(uint32_t *seconds)
 {
+    union {
+        uint16_t buf[2];
+        uint32_t seconds;
+    } buffer;
+    int8_t ret = sensirion_read_cmd(SPS_CMD_AUTOCLEAN_INTERVAL,
+                                     buffer.buf, SENSIRION_NUM_WORDS(buffer));
+    if (ret != STATUS_OK)
+        return ret;
     
+    SENSIRION_WORDS_TO_BYTES(buffer.buf, SENSIRION_NUM_WORDS(buffer));
+    *seconds = be32_to_cpu(buffer.seconds);
+    
+    return 0;
 }
 
 /**
  * set the auto cleaning interval,
  * auto-cleaning starts fan at full speed for 10 seconds
- * default: 604800 seconds (1 week)
+ * default: 345600 seconds (4 days)
  *
  * NOTE: if the sensor is off (power off) the internal clock is reseted to 0!
  * make sure that the sensor is cleaned at least once a week
+ *
+ * after setting a new interval this immediately active,
+ * getFanAutoCleanInterval will not return this value until the next start/restart of the sensor
  *
  * seconds: auto cleaning interval
  *
@@ -236,5 +285,13 @@ int8_t sps30_getFanAutoCleanInterval(uint32_t *seconds)
  */
 int8_t sps30_setFanAutoCleanInterval(uint32_t seconds)
 {
+    const uint16_t buffer[2] = {
+        (seconds & 0xFFFF0000) >> 16,
+        (seconds & 0x0000FFFF) >> 0
+    };
     
+    int8_t ret = sensirion_write_cmd_with_args(SPS_CMD_AUTOCLEAN_INTERVAL, buffer,
+                                            SENSIRION_NUM_WORDS(buffer));
+    usleep(SPS_WRITE_DELAY);
+    return ret;
 }

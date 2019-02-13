@@ -16,7 +16,9 @@
 
 #define SPS_MAX_ASCII_LEN 32
 
-struct sensorData {                 // mg = microgramm!
+// force bit alignment
+#pragma pack(push, 1)
+struct sensorData {                 // μg = microgramm!
     float mass_particlemc_010pm;    // pm1      μg/m3
     float mass_particlemc_025pm;    // pm2.5    μg/m3
     float mass_particlemc_040pm;    // pm4      μg/m3
@@ -28,6 +30,7 @@ struct sensorData {                 // mg = microgramm!
     float count_particle_100pm;     // pm10     #/cm3
     float avg_particle_size;        // in micrometer
 };
+#pragma pack(pop)
 
 #pragma mark - Sensor Controls
 
@@ -119,10 +122,13 @@ int8_t sps30_startFanCleaning(void);
 /**
  * get the auto cleaning interval,
  * auto-cleaning starts fan at full speed for 10 seconds
- * default: 604800 seconds (1 week)
+ * default: 345600 seconds (4 days)
  *
  * NOTE: if the sensor is off (power off) the internal clock is reseted to 0!
  * make sure that the sensor is cleaned at least once a week
+ *
+ * after setting a new interval this immediately active,
+ * getFanAutoCleanInterval will not return this value until the next start/restart of the sensor
  *
  * seconds: auto cleaning interval
  *
@@ -133,10 +139,13 @@ int8_t sps30_getFanAutoCleanInterval(uint32_t *seconds);
 /**
  * set the auto cleaning interval,
  * auto-cleaning starts fan at full speed for 10 seconds
- * default: 604800 seconds (1 week)
+ * default: 345600 seconds (4 days)
  *
  * NOTE: if the sensor is off (power off) the internal clock is reseted to 0!
  * make sure that the sensor is cleaned at least once a week
+ *
+ * after setting a new interval this immediately active,
+ * getFanAutoCleanInterval will not return this value until the next start/restart of the sensor
  *
  * seconds: auto cleaning interval
  *
