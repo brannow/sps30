@@ -11,30 +11,25 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#include "arg_parser.h"
 #include "sps30.h"
 
-void signalHandler(int signalCode)
+void signalHandler(int signalCode);
+void initApplication(int argc, char * argv[]);
+void stopAppication(void);
+
+/**
+ *
+ */
+int main(int argc, char * argv[])
 {
-    sps30_stop();
-    exit(1);
-}
-
-
-
-int main(int argc, const char * argv[])
-{
-    // signal handler
-    struct sigaction sigIntHandler;
-    sigIntHandler.sa_handler = signalHandler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    // first call init application
+    initApplication(argc, argv);
     
-    // sensor init
-    sps30_init();
-    sps30_reset();
-    sps30_start();
-    
+    // init sensor
+    //sps30_init();
+    //sps30_start();
+    /*
     uint32_t seconds = 0;
     if (sps30_getFanAutoCleanInterval(&seconds) == 0) {
         printf("interval: %d \n", seconds);
@@ -50,7 +45,7 @@ int main(int argc, const char * argv[])
     } else {
         printf("failed");
     }
-    
+    */
     /*bool isReady = false;
     struct sensorData data;
     
@@ -88,8 +83,46 @@ int main(int argc, const char * argv[])
         sleep(1);
     }*/
     
-    // exit
-    signalHandler(0);
     
+    // exit
+    stopAppication();
     return 0;
+}
+
+/**
+ * Initzialize Application
+ */
+void initApplication(int argc, char * argv[])
+{
+    // signal handler eg: CTRL + C or CTRL + T
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = signalHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+    sigaction(SIGINT, &sigIntHandler, NULL);
+    
+    // argument parser
+    uint8_t ret = arg_parser_init(argc, argv);
+    if (ret < 0) {
+        // cannot init argument parsing exit
+        printf("argument parsing error %d", ret);
+        exit(1);
+    }
+}
+
+/**
+ * Handle all incomming signals such as the termination CTRL + C
+ */
+void signalHandler(int signalCode)
+{
+    stopAppication();
+}
+
+/**
+ * stops sensor and free all memory if needed
+ */
+void stopAppication(void)
+{
+    sps30_stop();
+    exit(1);
 }
