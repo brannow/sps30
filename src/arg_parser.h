@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#define MAX_SCANNING_TIME_SECONDS 255
+
 struct arg_parser_arguments {
     uint8_t avg;            // -a, --avg            0 | 1
     uint8_t json;           // -j, --json           0 | 1

@@ -15,7 +15,6 @@
 
 
 #define PATH_MAX_LENGTH 255
-#define MAX_SCANNING_TIME_SECONDS 255
 #define POST_NAME_MAX_LENGTH 30
 
 const char *argp_program_version = "sps30 0.1";
@@ -29,7 +28,7 @@ static char args_doc[] = "";
 
 struct argp_option options[] =
 {
-    {"time",            't', "SECONDS",     0, "sample rate timing. Max: 255, Default: 1."},
+    {"time",            't', "SECONDS",     0, "sample rate timing. Max: 255, Default: 0.ZERO means no Loop, ONE the outpu is every second..."},
     
     {"avg",             'a', 0,             0, "shrink all collected data since last output to one set."},
     {"json",            'j', 0,             0, "shrink all collected data since last output to one set."},
