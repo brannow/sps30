@@ -14,9 +14,14 @@
 #define MAX_SCANNING_TIME_SECONDS 255
 
 struct arg_parser_arguments {
+    uint32_t writeClean;    // -w, --set-auto-clean seconds
+    uint8_t readClean;      // -r, --get-auto-clean
+    uint8_t forceClean;     // -c, --force-clean
+    
     uint8_t avg;            // -a, --avg            0 | 1
     uint8_t json;           // -j, --json           0 | 1
     uint8_t file_append;    // -p, --file-append    0 | 1
+    uint8_t verbose;        // -v, --verbose        0 | 1
     
     uint16_t time;          // -t, --time           0-255
     

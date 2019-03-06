@@ -28,6 +28,10 @@ static char args_doc[] = "";
 
 struct argp_option options[] =
 {
+    {"set-auto-clean",  'w', "SECONDS",     0, "set the auto fan dust clean interval in seconds must be over 9000!, eg.: 345600 seconds are 4 days"},
+    {"get-auto-clean",  'r', 0,             0, "get the auto fan dust clean interval in seconds"},
+    {"force-clean",     'c', 0,             0, "force start the fan dust clean mode, for 10 seconds 100% fan speed."},
+    
     {"time",            't', "SECONDS",     0, "sample rate timing. Max: 255, Default: 0.ZERO means no Loop, ONE the outpu is every second..."},
     
     {"avg",             'a', 0,             0, "shrink all collected data since last output to one set."},
@@ -37,6 +41,8 @@ struct argp_option options[] =
     {"file-append",     'p', 0,             0, "Append data into file (only relevant for file option)."},
     {"url",             'u', "URL",         0, "Send Data to given URL."},
     {"url-post-name",   'n', "NAME",        0, "The URL POST name (max 30 chars). Default: 'data'."},
+    
+    {"verbose",         'v', 0,             0, "verbose mode. Print sensor data every time"},
     {0}
 };
 
@@ -47,7 +53,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
     
     switch (key) {
         case 't': {
-            int32_t time = arg ? atoi (arg) : 0;
+            int32_t time = abs(arg ? strtol(arg, (char**)NULL, 10) : 0);
             if (time > 0 && time <= MAX_SCANNING_TIME_SECONDS) {
                 arguments->time = (uint8_t)time;
             } else if (time > MAX_SCANNING_TIME_SECONDS) {
@@ -77,6 +83,25 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
             arguments->file_append = 1;
             break;
         }
+        case 'v': {
+            arguments->verbose = 1;
+            break;
+        }
+            
+        case 'w': {
+            uint32_t time = abs(arg ? strtoul(arg, (char**)NULL, 10) : 0);
+            arguments->writeClean = time;
+            break;
+        }
+        case 'r': {
+            arguments->readClean = 1;
+            break;
+        }
+        case 'c': {
+            arguments->forceClean = 1;
+            break;
+        }
+            
         case 'u': {
             arguments->url = (char *)malloc(sizeof(char) * PATH_MAX_LENGTH + 1);
             strncpy(arguments->url, arg, PATH_MAX_LENGTH);
@@ -115,10 +140,14 @@ int8_t arg_parser_init(int argc, char **argv, struct arg_parser_arguments *argum
     arguments->avg = 0;
     arguments->json = 0;
     arguments->file_append = 0;
+    arguments->verbose = 0;
     arguments->time = 0;
     arguments->file = NULL;
     arguments->url = NULL;
     arguments->url_post_name = NULL;
+    arguments->writeClean = 0;
+    arguments->readClean = 0;
+    arguments->forceClean = 0;
     
     int8_t ret = argp_parse(&argp, argc, argv, 0, 0, arguments);
     return ret;

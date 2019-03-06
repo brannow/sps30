@@ -22,15 +22,15 @@ void signalHandler(int signalCode);
 void initApplication(int argc, char * argv[]);
 void stopAppication(void);
 
-void startSensor();
-void gatherSensorData();
+void startSensor(void);
+void gatherSensorData(void);
 
-void outputSensorData();
+void outputSensorData(void);
 void transformSensorDataToRaw(struct sensorData sd, char *output);
 void transformSensorDataToJson(struct sensorData sd, char *output);
 void caluclateAVGSensorData(struct sensorData *sd);
-
-
+void writeOutputIntoFile(const char *, const char *, const char *);
+void setupFanDustClean(void);
 
 static struct arg_parser_arguments args;
 static uint8_t sensorStatus = 0;
@@ -47,6 +47,13 @@ int main(int argc, char * argv[])
     // first call init application
     initApplication(argc, argv);
     startSensor();
+    
+    if (args.forceClean == 1 || args.readClean == 1 || args.writeClean == 1) {
+        setupFanDustClean();
+        stopAppication(); // exit
+    }
+    
+    exit(1);
     
     if (args.time > 0) {
         sensorDataLimit = args.time;
@@ -70,30 +77,15 @@ int main(int argc, char * argv[])
 
 void startSensor()
 {
-    /*
-     sps30_setFanAutoCleanInterval(345600);
-     sleep(2);
-     
-     if (sps30_getFanAutoCleanInterval(&seconds) == 0) {
-     printf("interval: %d \n", seconds);
-     } else {
-     printf("failed");
-     }
-     */
-    
     if (sensorStatus == 0) {
         if (sps30_init() == 0 && sps30_start() == 0) {
             sensorStatus = 1;
-            uint32_t seconds = 0;
-            if (sps30_getFanAutoCleanInterval(&seconds) == 0) {
-                printf("auto fan clean Interval: %d seconds (%d days) \n", seconds, seconds / 86400);
-            }
         } else {
-            printf("[ERROR]: fail to init sensor\n");
+            printf("failed to init sensor\n");
             stopAppication();
         }
     } else {
-        printf("sensor already running \n");
+        printf("sensor already running, continue \n");
     }
 }
 
@@ -180,19 +172,33 @@ void outputSensorData()
     }
     
     // output data
-    if (args.url == NULL && args.file == NULL) {
+    if ((args.url == NULL && args.file == NULL) || args.verbose == 1) {
         printf(outputBuffer);
         printf("\n");
-    } else {
-        if (args.file != NULL) {
-            //TODO: output into file
+    }
+    
+    if (args.file != NULL) {
+        if (args.file_append == 1) {
+            writeOutputIntoFile(args.file, "a",outputBuffer);
+        } else {
+            writeOutputIntoFile(args.file, "w+",outputBuffer);
         }
-        if (args.url != NULL) {
-            //TODO: send to server
-        }
+    }
+    if (args.url != NULL) {
+        //TODO: send to server
     }
     
     free(outputBuffer);
+}
+
+void writeOutputIntoFile(const char *filePath, const char *mode, const char *output)
+{
+    FILE *f = fopen(filePath, mode);
+    if (f) {
+        fputs(output,f);
+        fputs("\n",f);
+        fclose(f);
+    }
 }
 
 void transformSensorDataToRaw(struct sensorData sd, char *output)
@@ -288,6 +294,41 @@ void caluclateAVGSensorData(struct sensorData *sd)
     sd->avg_particle_size = tmpData.avg_particle_size / sensorDataLimit;
 }
 
+void setupFanDustClean()
+{
+    if (args.forceClean == 1) {
+        printf("start fan cleaning, please wait...\n");
+        if (sps30_startFanCleaning() == 0) {
+            printf("done, shutdown sensor.\n");
+        } else {
+            printf("failed to start fan cleaning mode.\n");
+        }
+        return;
+    }
+    
+    if (args.readClean == 1) {
+        printf("read fan clean interval, please wait...\n");
+        uint32_t seconds = 0;
+        if (sps30_getFanAutoCleanInterval(&seconds) == 0) {
+            sleep(2);
+            printf("auto dusk fan clean Interval: %d seconds (%d days) \n", seconds, seconds / 86400);
+        } else {
+            printf("failed to read fan cleaning interval.\n");
+            return;
+        }
+    }
+    
+    if (args.writeClean >= 9000) {
+        printf("write fan clean interval, please wait...\n");
+        if (sps30_setFanAutoCleanInterval(args.writeClean)) {
+            sleep(2);
+            printf("set auto clean interval to Interval: %d seconds (%.1f days)\n",seconds, seconds / 86400);
+        }else {
+            printf("failed to write fan cleaning interval.\n");
+        }
+    }
+}
+
 /**
  * Initzialize Application
  */
@@ -303,7 +344,7 @@ void initApplication(int argc, char * argv[])
     // argument parser
     uint8_t ret = arg_parser_init(argc, argv, &args);
     
-    //printf("output:\navg: %d\njson: %d\nappend: %d\ntime: %d\n \nfile: %s\nurl: %s\npostName: %s\n\n", args.avg, args.json, args.file_append, args.time, args.file, args.url, args.url_post_name);
+    printf("output:\navg: %d\njson: %d\nappend: %d\ntime: %d\n \nfile: %s\nurl: %s\npostName: %s\nverbose: %d\nr: %d\nc: %d\nw: %d\n\n", args.avg, args.json, args.file_append, args.time, args.file, args.url, args.url_post_name, args.verbose, args.readClean, args.forceClean, args.writeClean);
     
     if (ret < 0) {
         // cannot init argument parsing exit
