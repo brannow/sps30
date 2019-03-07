@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-#define MAX_SCANNING_TIME_SECONDS 255
+#define MAX_SCANNING_TIME_SECONDS 3600
 
 struct arg_parser_arguments {
     uint32_t writeClean;    // -w, --set-auto-clean seconds
@@ -23,7 +23,7 @@ struct arg_parser_arguments {
     uint8_t file_append;    // -p, --file-append    0 | 1
     uint8_t verbose;        // -v, --verbose        0 | 1
     
-    uint16_t time;          // -t, --time           0-255
+    uint16_t time;          // -t, --time           0-3600
     
     char *file;             // -f, --file           string 255
     char *url;              // -u, --url            string 255

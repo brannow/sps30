@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
+#include <time.h>
 
 #include "arg_parser.h"
 #include "sps30.h"
@@ -60,7 +61,7 @@ int main(int argc, char * argv[])
     }
     
     data = (struct sensorData *)malloc(sizeof(struct sensorData) * sensorDataLimit);
-    printf("warmup...%d \n", OUTPUT_BUFFER_GROUP_SIZE);
+    printf("warmup... \n");
     sleep(3);
     gatherSensorData();
     
@@ -123,7 +124,6 @@ void outputSensorData()
 {
     char *outputBuffer;
     if (args.avg == 1 || sensorDataLimit == 1) {
-        // 256Byte buffer
         outputBuffer = (char *)malloc(sizeof(char) * OUTPUT_BUFFER_SINGLE_SIZE);
         outputBuffer[0] = '\0';
         // get the avg of the sensorData
@@ -141,7 +141,6 @@ void outputSensorData()
         }
         
     } else {
-        // 64KB buffer
         outputBuffer = (char *)malloc(sizeof(char) * OUTPUT_BUFFER_GROUP_SIZE);
         outputBuffer[0] = '\0';
         char *subBuffer = (char *)malloc(sizeof(char) * OUTPUT_BUFFER_SINGLE_SIZE);
@@ -202,6 +201,7 @@ void writeOutputIntoFile(const char *filePath, const char *mode, const char *out
 void transformSensorDataToRaw(struct sensorData sd, char *output)
 {
     sprintf(output,
+            "time %lu\n"
             "0.3-1μm %0.2fμg/m3\n"
             "0.3-2.5μm %0.2fμg/m3\n"
             "0.3-4μm %0.2fμg/m3\n"
@@ -212,6 +212,7 @@ void transformSensorDataToRaw(struct sensorData sd, char *output)
             "0.3-4μm %0.2f/cm3\n"
             "0.3-10μm %0.2f/cm3\n"
             "avg %0.2fμm\0",
+            (unsigned long)time(NULL),
             sd.mass_particlemc_010pm,
             sd.mass_particlemc_025pm,
             sd.mass_particlemc_040pm,
@@ -238,7 +239,8 @@ void transformSensorDataToJson(struct sensorData sd, char *output)
             "\"c_003-025\": %0.2f,"
             "\"c_003-040\": %0.2f,"
             "\"c_003-100\": %0.2f,"
-            "\"avg\": %0.2f"
+            "\"avg\": %0.2f,"
+            "\"ts\": %lu"
             "}\0",
             sd.mass_particlemc_010pm,
             sd.mass_particlemc_025pm,
@@ -249,7 +251,8 @@ void transformSensorDataToJson(struct sensorData sd, char *output)
             sd.count_particle_025pm,
             sd.count_particle_040pm,
             sd.count_particle_100pm,
-            sd.avg_particle_size
+            sd.avg_particle_size,
+            (unsigned long)time(NULL)
             );
 }
 

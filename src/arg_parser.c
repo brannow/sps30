@@ -32,7 +32,7 @@ struct argp_option options[] =
     {"get-auto-clean",  'r', 0,             0, "get the auto fan dust clean interval in seconds"},
     {"force-clean",     'c', 0,             0, "force start the fan dust clean mode, for 10 seconds 100% fan speed."},
     
-    {"time",            't', "SECONDS",     0, "sample rate timing. Max: 255, Default: 0.ZERO means no Loop, ONE the outpu is every second..."},
+    {"time",            't', "SECONDS",     0, "sample rate timing. Max: 3600, Default: 0.ZERO means no Loop, ONE the outpu is every second..."},
     
     {"avg",             'a', 0,             0, "shrink all collected data since last output to one set."},
     {"json",            'j', 0,             0, "shrink all collected data since last output to one set."},
