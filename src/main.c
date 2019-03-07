@@ -15,6 +15,7 @@
 
 #include "arg_parser.h"
 #include "sps30.h"
+#include "http.h"
 
 #define OUTPUT_BUFFER_SINGLE_SIZE 256
 #define OUTPUT_BUFFER_GROUP_SIZE (OUTPUT_BUFFER_SINGLE_SIZE * MAX_SCANNING_TIME_SECONDS)
@@ -47,6 +48,7 @@ int main(int argc, char * argv[])
 {
     // first call init application
     initApplication(argc, argv);
+    sleep(1);
     startSensor();
     
     if (args.forceClean == 1 || args.readClean == 1 || args.writeClean != 0) {
@@ -63,10 +65,14 @@ int main(int argc, char * argv[])
     data = (struct sensorData *)malloc(sizeof(struct sensorData) * sensorDataLimit);
     printf("warmup... \n");
     sleep(3);
-    printf("done. ");
+    printf("done. \n");
     if (args.time > 5) {
-        printf("next output in %d seconds", args.time);
+        printf("next output in %d seconds \n", args.time);
     }
+    
+    
+    
+    sleep(1);
     gatherSensorData();
     
     if (data != NULL) {
@@ -180,13 +186,17 @@ void outputSensorData()
     
     if (args.file != NULL) {
         if (args.file_append == 1) {
-            writeOutputIntoFile(args.file, "a",outputBuffer);
+            writeOutputIntoFile(args.file, "a", outputBuffer);
         } else {
-            writeOutputIntoFile(args.file, "w+",outputBuffer);
+            writeOutputIntoFile(args.file, "w+", outputBuffer);
         }
     }
     if (args.url != NULL) {
-        //TODO: send to server
+        if (http_send_post_request(args.url, args.url_post_name, outputBuffer) == 0) {
+            printf("data (%d bytes) send to server: %s \n", strlen(outputBuffer), args.url);
+        } else {
+            printf("failed to send data to server: %s", strlen(outputBuffer), args.url);
+        }
     }
     
     free(outputBuffer);
@@ -371,7 +381,9 @@ void signalHandler(int signalCode)
  */
 void stopAppication(void)
 {
+    printf("\nshutdown sensor.\n");
     sps30_stop();
     sps30_reset();
+    printf("shutdown complete.\n");
     exit(1);
 }

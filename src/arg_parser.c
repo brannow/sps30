@@ -73,7 +73,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
         case 'f': {
             arguments->file = (char *)malloc(sizeof(char) * PATH_MAX_LENGTH + 1);
             strncpy(arguments->file, arg, PATH_MAX_LENGTH);
-            arguments->file[PATH_MAX_LENGTH] = '\0';
+            strncat(arguments->file, "\0", 1);
             if (strlen(arg) > PATH_MAX_LENGTH) {
                 printf("WARNING: file path max length is %d\n", PATH_MAX_LENGTH);
             }
@@ -105,7 +105,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
         case 'u': {
             arguments->url = (char *)malloc(sizeof(char) * PATH_MAX_LENGTH + 1);
             strncpy(arguments->url, arg, PATH_MAX_LENGTH);
-            arguments->url[PATH_MAX_LENGTH] = '\0';
+            strncat(arguments->url, "\0", 1);
             if (strlen(arg) > PATH_MAX_LENGTH) {
                 printf("WARNING: url max length is %d\n", PATH_MAX_LENGTH);
             }
@@ -114,7 +114,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
         case 'n': {
             arguments->url_post_name = (char *)malloc(sizeof(char) * POST_NAME_MAX_LENGTH + 1);
             strncpy(arguments->url_post_name, arg, POST_NAME_MAX_LENGTH);
-            arguments->url_post_name[POST_NAME_MAX_LENGTH] = '\0';
+            strncat(arguments->url_post_name, "\0", 1);
             if (strlen(arg) > POST_NAME_MAX_LENGTH) {
                 printf("WARNING: url-post-name max length is %d\n", POST_NAME_MAX_LENGTH);
             }
@@ -144,7 +144,7 @@ int8_t arg_parser_init(int argc, char **argv, struct arg_parser_arguments *argum
     arguments->time = 0;
     arguments->file = NULL;
     arguments->url = NULL;
-    arguments->url_post_name = NULL;
+    arguments->url_post_name = "data";
     arguments->writeClean = 0;
     arguments->readClean = 0;
     arguments->forceClean = 0;

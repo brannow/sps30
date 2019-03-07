@@ -62,6 +62,14 @@ the output should look like this:
 
 0x69 is the i2c address from the sps30 - sensor
 
+## Libaries
+* libcurl-dev
+
+we just need the <curl/curl.h>
+```
+sudo apt-get install libcurl4-openssl-dev
+```
+
 ## Compile 
 execute the build script 
 ```

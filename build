@@ -2,4 +2,4 @@
 rm -rf bin
 mkdir bin
 #gcc -pthread $(find ./src -name "*.c") -o sps30Bin -v
-gcc $(find ./src -name "*.c") -o bin/sps30
+gcc $(find ./src -name "*.c") -o bin/sps30 -lcurl
