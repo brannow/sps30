@@ -23,7 +23,7 @@ struct arg_parser_arguments {
     uint8_t file_append;    // -p, --file-append    0 | 1
     uint8_t verbose;        // -v, --verbose        0 | 1
     
-    uint16_t time;          // -t, --time           0-3600
+    uint32_t time;          // -t, --time           0-3600
     
     char *file;             // -f, --file           string 255
     char *url;              // -u, --url            string 255

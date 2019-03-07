@@ -63,6 +63,7 @@ int main(int argc, char * argv[])
     data = (struct sensorData *)malloc(sizeof(struct sensorData) * sensorDataLimit);
     printf("warmup... \n");
     sleep(3);
+    printf("done...\n");
     gatherSensorData();
     
     if (data != NULL) {

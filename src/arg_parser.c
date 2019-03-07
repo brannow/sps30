@@ -53,9 +53,9 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
     
     switch (key) {
         case 't': {
-            int32_t time = abs(arg ? strtol(arg, (char**)NULL, 10) : 0);
+            uint32_t time = abs(arg ? strtoul(arg, (char**)NULL, 10) : 0);
             if (time > 0 && time <= MAX_SCANNING_TIME_SECONDS) {
-                arguments->time = (uint8_t)time;
+                arguments->time = time;
             } else if (time > MAX_SCANNING_TIME_SECONDS) {
                 arguments->time = MAX_SCANNING_TIME_SECONDS;
                 printf("WARNING: max time is %d; time auto set to %d\n", MAX_SCANNING_TIME_SECONDS);
