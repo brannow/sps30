@@ -48,12 +48,10 @@ int main(int argc, char * argv[])
     initApplication(argc, argv);
     startSensor();
     
-    if (args.forceClean == 1 || args.readClean == 1 || args.writeClean == 1) {
+    if (args.forceClean == 1 || args.readClean == 1 || args.writeClean != 0) {
         setupFanDustClean();
         stopAppication(); // exit
     }
-    
-    exit(1);
     
     if (args.time > 0) {
         sensorDataLimit = args.time;
@@ -306,12 +304,12 @@ void setupFanDustClean()
         return;
     }
     
-    if (args.readClean == 1) {
+    if (args.readClean == 1 || args.writeClean != 0) {
         printf("read fan clean interval, please wait...\n");
         uint32_t seconds = 0;
         if (sps30_getFanAutoCleanInterval(&seconds) == 0) {
             sleep(2);
-            printf("auto dusk fan clean Interval: %d seconds (%d days) \n", seconds, seconds / 86400);
+            printf("auto dusk fan clean Interval: %d seconds (%0.1f days) \n", seconds, (float)seconds / 86400);
         } else {
             printf("failed to read fan cleaning interval.\n");
             return;
@@ -320,9 +318,9 @@ void setupFanDustClean()
     
     if (args.writeClean >= 9000) {
         printf("write fan clean interval, please wait...\n");
-        if (sps30_setFanAutoCleanInterval(args.writeClean)) {
+        if (sps30_setFanAutoCleanInterval(args.writeClean) == 0) {
             sleep(2);
-            printf("set auto clean interval to Interval: %d seconds (%.1f days)\n",seconds, seconds / 86400);
+            printf("set auto clean interval to Interval: %d seconds (%0.1f days)\n",args.writeClean, (float)args.writeClean / 86400);
         }else {
             printf("failed to write fan cleaning interval.\n");
         }
