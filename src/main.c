@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
     data = (struct sensorData *)malloc(sizeof(struct sensorData) * sensorDataLimit);
     printf("warmup... \n");
     sleep(3);
-    printf("done");
+    printf("done. ");
     if (args.time > 5) {
         printf("next output in %d seconds", args.time);
     }
@@ -115,10 +115,10 @@ void gatherSensorData()
                         return;
                     }
                 } else {
-                    printf("failed to load sensor data");
+                    printf("failed to load sensor data\n");
                 }
             } else {
-                printf("no new sensor data available (maybe bus is unstable)");
+                printf("no new sensor data available (maybe bus is unstable)\n");
             }
         }
     }
