@@ -195,7 +195,7 @@ void outputSensorData()
         if (http_send_post_request(args.url, args.url_post_name, outputBuffer) == 0) {
             printf("data (%d bytes) send to server: %s \n", strlen(outputBuffer), args.url);
         } else {
-            printf("failed to send data to server: %s", strlen(outputBuffer), args.url);
+            printf("failed to send data to server: %s \n", args.url);
         }
     }
     
