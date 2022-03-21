@@ -10,6 +10,7 @@
 #include <curl/curl.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp)
 {
